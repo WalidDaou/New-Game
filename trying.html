@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Shining Game</title>
+  <style>
+    .shining {
+      background-color: yellow;
+    }
+    .item{
+        border: 1px solid black;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>Shining Game</h1>
+  
+  <div id="itemContainer">
+    <div class="item" onclick="checkClick(this)"></div>
+    <div class="item" onclick="checkClick(this)"></div>
+    <div class="item" onclick="checkClick(this)"></div>
+    <div class="item" onclick="checkClick(this)"></div>
+  </div>
+
+  <script>
+    const items = document.querySelectorAll('.item');
+    let shiningItemIndex;
+
+    function startGame() {
+      resetItems();
+      setTimeout(shineRandomItem, 1000);
+    }
+
+    function resetItems() {
+      items.forEach(item => item.classList.remove('shining'));
+    }
+
+    function shineRandomItem() {
+      resetItems();
+      shiningItemIndex = Math.floor(Math.random() * items.length);
+      items[shiningItemIndex].classList.add('shining');
+      setTimeout(resetItems, 5000);
+    }
+
+    function checkClick(clickedItem) {
+      const clickedIndex = Array.from(items).indexOf(clickedItem);
+      if (clickedIndex === shiningItemIndex) {
+        alert("Correct! You clicked the shining item.");
+        shineRandomItem();
+      } else {
+        alert("Wrong! Game over. Try again.");
+        startGame();
+      }
+    }
+
+    // Start the game when the page loads
+    window.onload = startGame;
+  </script>
+
+</body>
+</html>
