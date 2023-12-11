@@ -7,9 +7,16 @@
     <link rel="stylesheet" href="https://unpkg.com/tailwindcss@2.2.19/dist/tailwind.min.css" />
     <link href="https://fonts.googleapis.com/css?family=Work+Sans:200,400&display=swap" rel="stylesheet" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Pixelify+Sans&display=swap" rel="stylesheet">
     <title>Memory game</title>
 
     <style>
+        * {
+            font-family: 'Pixelify Sans', sans-serif;
+        }
+
         .bottoms {
             border: 2px solid red;
             width: 400px;
@@ -179,7 +186,7 @@
 
         function resetItems() {
             colArr.forEach(button => button.classList.remove('shining'));
-            
+
         }
 
         var userInput;
@@ -221,12 +228,18 @@
             resetItems();
             userClickEnabled = false;
             var randomButtonIndex = Math.floor(Math.random() * colArr.length);
+            var randomButtonIndex = Math.floor(Math.random() * colArr.length);
+            var randomButtonIndex = Math.floor(Math.random() * colArr.length);
+            var randomButtonIndex = Math.floor(Math.random() * colArr.length);
+            var randomButtonIndex = Math.floor(Math.random() * colArr.length);
+            var randomButtonIndex = Math.floor(Math.random() * colArr.length);
+            var randomButtonIndex = Math.floor(Math.random() * colArr.length);
             shiningSequence.push(colArr[randomButtonIndex]);
             for (let element of shiningSequence) {
                 setTimeout(function () {
                     element.classList.add('shining');
                     setTimeout(function () {
-                        element.classList.remove('shining'); 
+                        element.classList.remove('shining');
                         notificationGame('...')
                     }, 1000);
 

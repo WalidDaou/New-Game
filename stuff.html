@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simon Game</title>
+    <style>
+        .container {
+            display: grid;
+            grid-template-columns: repeat(4, 100px);
+            grid-template-rows: repeat(4, 100px);
+            gap: 10px;
+        }
+
+        .btn {
+            background-color: grey;
+            height: 100px;
+            width: 100px;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 2em;
+            color: white;
+            transition: background-color 0.5s;
+        }
+
+        .btn:active {
+            transform: scale(0.9);
+        }
+
+        .shining {
+            animation: shining 1s infinite;
+        }
+
+        @keyframes shining {
+            0% {
+                background-color: grey;
+            }
+            50% {
+                background-color: yellow;
+            }
+            100% {
+                background-color: grey;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div id="red" class="btn"></div>
+        <div id="green" class="btn"></div>
+        <div id="blue" class="btn"></div>
+        <div id="yellow" class="btn"></div>
+    </div>
+    <h2 id="notification"></h2>
+    <script>
+        const red = document.querySelector('#red');
+        const green = document.querySelector('#green');
+        const blue = document.querySelector('#blue');
+        const yellow = document.querySelector('#yellow');
+        const colArr = [red, green, blue, yellow];
+        const notification = document.getElementById('notification');
+        let userClickEnabled = false;
+        let shiningSequence = [];
+
+        function forEffect() {
+            colArr.forEach((element, index) => {
+                setTimeout(() => {
+                    element.classList.add('shining');
+                    setTimeout(() => {
+                        element.classList.remove('shining');
+                    }, 1000);
+                }, 500 * index);
+            });
+        }
+
+        function resetItems() {
+            shiningSequence = [];
+        }
+
+        function shineRandomItem() {
+            resetItems();
+            userClickEnabled = false;
+            const randomButtonIndex = Math.floor(Math.random() * colArr.length);
+            const randomButtonIndex2 = Math.floor(Math.random() * colArr.length);
+            shiningSequence.push(colArr[randomButtonIndex], colArr[randomButtonIndex2]);
+            for (let element of shiningSequence) {
+                setTimeout(() => {
+                    element.classList.add('shining');
+                    setTimeout(() => {
+                        element.classList.remove('shining');
+                        notification.textContent = '...';
+                    }, 1000);
+                }, 500 * shiningSequence.indexOf(element));
+            }
+            setTimeout(() => {
+                userClickEnabled = true; // Enable user clicks after sequence display
+            }, 1000 * shiningSequence.length);
+        }
+
+        function checkArraysEqual(arr1, arr2) {
+            if (arr1.length !== arr2.length) {
+                return false;
+            }
+            for (let i = 0; i < arr1.length; i++) {
+                if (arr1[i] !== arr2[i]) {
+                    return false;
+                }
+            }
+            return true;
+        }
+
+        colArr.forEach((element, index) => {
+            element.addEventListener('click', () => {
+                if (userClickEnabled) {
+                    element.classList.add('shining');
+                    setTimeout(() => {
+                        element.classList.remove('shining');
+                    }, 1000);
+                    shiningSequence.push(element);
+                    if (!checkArraysEqual(shiningSequence, colArr.slice(0, shiningSequence.length))) {
+                        notification.textContent = 'Wrong! Try again.';
+                        shiningSequence = [];
+                    } else if (shiningSequence.length === colArr.length) {
+                        notification.textContent = 'Congratulations! You won!';
+                        shiningSequence = [];
+                    }
+                }
+            });
+        });
+
+        window.onload = function () {
+            takeInput();
+            red = document.querySelector('#red');
+            green = document.querySelector('#green');
+            blue = document.querySelector('#blue');
+            yellow = document.querySelector('#yellow');
+            forEffect();
+        };
+    </script>
+</body>
+
+</html>
