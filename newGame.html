@@ -19,26 +19,12 @@
             color: rgb(9, 138, 95);
         }
 
-        #red {
-            border: solid 0.5px rgb(29, 29, 29);
-        }
-
-        #green {
-            border: solid 0.5px rgb(29, 29, 29);
-        }
-
-        #blue {
-            border: solid 0.5px rgb(29, 29, 29);
-        }
-
+        #blue,
+        #red,
+        #green,
         #yellow {
             border: solid 0.5px rgb(29, 29, 29);
-
         }
-
-
-
-
 
         .shadow1 {
             box-shadow: 10px 5px 10px rgba(250, 6, 197, 0.521);
@@ -55,32 +41,36 @@
         .shadow4 {
             box-shadow: 10px 5px 10px rgba(200, 231, 24, 0.521);
         }
+        .shining {
+            box-shadow: 10px 5px 10px rgba(250, 6, 197, 0.521);
+        }
     </style>
 </head>
 
 <body>
     <div class="bg-black flex flex-col gap-20 justify-center items-center h-screen w-screen relative">
         <div>
-            <p class="start text-white text-3xl cursor-pointer">START !</p>
+            <p onclick="startGame()" class="start text-white text-3xl cursor-pointer">START !</p>
         </div>
         <div class="bottoms bg-white p-6">
             <div class="flex flex-row gap-8 justify-center items-center mb-8">
                 <button id="green" onclick="greenEffect()"
-                    class="text-white bg-green-500 h-36 w-60 rounded-xl ">green</button>
-                <button id="red" onclick="redEffect()" class="text-white bg-red-500 h-36 w-60 rounded-xl ">red</button>
+                    class="circle text-white bg-green-500 h-36 w-60 rounded-xl ">green</button>
+                <button id="red" onclick="redEffect()"
+                    class="circle text-white bg-red-500 h-36 w-60 rounded-xl ">red</button>
             </div>
             <div class="flex flex-row gap-8 justify-center items-center mt-8">
                 <button id="yellow" onclick="yellowEffect()"
-                    class="text-white bg-yellow-300 h-36 w-60 rounded-xl ">yellow</button>
+                    class="circle text-white bg-yellow-300 h-36 w-60 rounded-xl ">yellow</button>
                 <button id="blue" onclick="blueEffect()"
-                    class="text-white bg-blue-500 h-36 w-60 rounded-xl ">blue</button>
+                    class="circle text-white bg-blue-500 h-36 w-60 rounded-xl ">blue</button>
             </div>
         </div>
         <div class="stuff absolute top-8 right-10 text-2xl">
             <p id="user" class="text-white">
                 user 007
             </p>
-            <p class="text-white">
+            <p class="level text-white">
                 level NA
             </p>
         </div>
@@ -109,6 +99,10 @@
             username.innerHTML = userInput || "user 007";
         }
 
+        function saveLevel() {
+            let level = document.querySelector('.level')
+            level.innerHTML = "level 1";
+        }
         // Function to add shadow to the button for 1 second
 
         function redEffect() {
@@ -159,8 +153,6 @@
             music.play()
         }
 
-
-
         function yellowEffect() {
             let button = document.getElementById('yellow');
 
@@ -176,23 +168,116 @@
             music.play()
         }
 
+        function forEffect() {
+            red.addEventListener('click', redEffect);
+            green.addEventListener('click', greenEffect);
+            blue.addEventListener('click', blueEffect);
+            yellow.addEventListener('click', yellowEffect);
+        }
 
-        let botarr = []
-        let colArr = [red, blue, green, yellow]
-        var red = document.querySelector('#red')
-        var blue = document.querySelector('#blue')
-        var yellow = document.querySelector('#yellow')
-        var green = document.querySelector('#red')
+        red = document.querySelector('#red');
+        green = document.querySelector('#green');
+        blue = document.querySelector('#blue');
+        yellow = document.querySelector('#yellow');
+        forEffect();
+
+        let colArr = document.querySelectorAll('.circle');
+        colArr = [ bleu, green ,yellow ,red,]
+        var userInput;
+        var shiningSequence = [];
+        var clickedSequence = [];
+        var level = 0;
+
+        // Function to display an alert on load
 
 
+        function saveLevel() {
+            let levelElement = document.querySelector('.level');
+            levelElement.innerHTML = "Level " + level;
+        }
 
+        function startGame() {
+            shiningSequence = [];
+            clickedSequence = [];
+            level = 1;
+            saveLevel();
+            shineRandomItem();
+        }
 
+        function shineRandomItem() {
+            resetItems();
 
+            // Add a random button to the shining sequence
+            var randomButtonIndex = Math.floor(Math.random() * colArr.length);
+            shiningSequence.push(colArr[randomButtonIndex]);
 
+            // Highlight the buttons in the shining sequence
+            for (let button of shiningSequence) {
+                setTimeout(function () {
+                    button.classList.add('shining');
+                    setTimeout(function () {
+                        button.classList.remove('shining');
+                    }, 1000);
+                }, 1000 * shiningSequence.indexOf(button));
+            }
+        }
 
+        function resetItems() {
+            colArr.forEach(button => button.classList.remove('shining'));
+        }
 
-        window.onload = takeInput;
+        function checkClick(clickedButton) {
+            clickedButton.classList.add('shining');
+
+            // Add the clicked button to the user's sequence
+            clickedSequence.push(clickedButton);
+
+            // Check if the user's sequence matches the shining sequence
+            if (checkArraysEqual(shiningSequence, clickedSequence)) {
+                if (clickedSequence.length === shiningSequence.length) {
+                    // User successfully completed the level
+                    level++;
+                    saveLevel();
+                    setTimeout(shineRandomItem, 1000);
+                    clickedSequence = [];
+                }
+            } else {
+                // Wrong button clicked, game over
+                alert("Wrong! Game over. Try again.");
+                startGame();
+            }
+        }
+
+        function checkArraysEqual(arr1, arr2) {
+            if (arr1.length !== arr2.length) {
+                return false;
+            }
+
+            for (let i = 0; i < arr1.length; i++) {
+                if (arr1[i] !== arr2[i]) {
+                    return false;
+                }
+            }
+
+            return true;
+        }
+
+        // Rest of your existing script
+
+        window.onload = function () {
+            takeInput();
+            red = document.querySelector('#red');
+            green = document.querySelector('#green');
+            blue = document.querySelector('#blue');
+            yellow = document.querySelector('#yellow');
+            forEffect();
+
+        };
+
     </script>
+
+
+
 </body>
 
 </html>
