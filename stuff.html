@@ -1,144 +1,280 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Simon Game</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Pixelify+Sans&display=swap" rel="stylesheet">
+    <title>Music Memory</title>
     <style>
-        .container {
-            display: grid;
-            grid-template-columns: repeat(4, 100px);
-            grid-template-rows: repeat(4, 100px);
-            gap: 10px;
-        }
-
-        .btn {
-            background-color: grey;
-            height: 100px;
-            width: 100px;
-            border-radius: 50%;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            font-size: 2em;
+        * {
             color: white;
-            transition: background-color 0.5s;
+            font-family: 'Pixelify Sans', sans-serif;
         }
 
-        .btn:active {
-            transform: scale(0.9);
+        button {
+            height: 200px;
+            width: 200px;
+            border-radius: 20px;
         }
 
-        .shining {
-            animation: shining 1s infinite;
+        .game-container {
+            background-color: white;
+            border-radius: 20px;
         }
 
-        @keyframes shining {
-            0% {
-                background-color: grey;
-            }
-            50% {
-                background-color: yellow;
-            }
-            100% {
-                background-color: grey;
-            }
+        .title-text {
+            font-size: 96px;
+            color: white;
+        }
+
+        .title-text:hover {
+            color: green;
+        }
+
+        p {
+            font-size: 24px;
+            color: green;
+        }
+
+        .highlighted {
+            box-shadow: 0 0 20px 5px green;
+        }
+
+        .game-container {
+            display: none;
+        }
+
+        #green {
+            background-color: #0d431d;
+        }
+
+        #red {
+            background-color: #c05245;
+        }
+
+        #yellow {
+            background-color: #6e380d;
+        }
+
+        #blue {
+            background-color: #10506a;
         }
     </style>
 </head>
-<body>
-    <div class="container">
-        <div id="red" class="btn"></div>
-        <div id="green" class="btn"></div>
-        <div id="blue" class="btn"></div>
-        <div id="yellow" class="btn"></div>
+<body class="bg-black h-screen">
+    <div class="main-container flex flex-col items-center h-screen">
+        <div class="title-container">
+            <span id="startText" class="title-text my-24 cursor-pointer"> Start! 😸 </span>
+        </div>
+        <div class="game-container flex flex-col gap-8 p-8">
+            <!-- Buttons will be dynamically loaded here -->
+        </div>
+        <div class="user-info-div absolute top-10 right-10">
+            <p class="user-text"> User: Default </p>
+            <p class="level-text"> Level: 0 </p>
+            <p class="timer-text"> Timer: 0s </p>
+        </div>
     </div>
-    <h2 id="notification"></h2>
-    <script>
-        const red = document.querySelector('#red');
-        const green = document.querySelector('#green');
-        const blue = document.querySelector('#blue');
-        const yellow = document.querySelector('#yellow');
-        const colArr = [red, green, blue, yellow];
-        const notification = document.getElementById('notification');
-        let userClickEnabled = false;
-        let shiningSequence = [];
-
-        function forEffect() {
-            colArr.forEach((element, index) => {
-                setTimeout(() => {
-                    element.classList.add('shining');
-                    setTimeout(() => {
-                        element.classList.remove('shining');
-                    }, 1000);
-                }, 500 * index);
-            });
-        }
-
-        function resetItems() {
-            shiningSequence = [];
-        }
-
-        function shineRandomItem() {
-            resetItems();
-            userClickEnabled = false;
-            const randomButtonIndex = Math.floor(Math.random() * colArr.length);
-            const randomButtonIndex2 = Math.floor(Math.random() * colArr.length);
-            shiningSequence.push(colArr[randomButtonIndex], colArr[randomButtonIndex2]);
-            for (let element of shiningSequence) {
-                setTimeout(() => {
-                    element.classList.add('shining');
-                    setTimeout(() => {
-                        element.classList.remove('shining');
-                        notification.textContent = '...';
-                    }, 1000);
-                }, 500 * shiningSequence.indexOf(element));
-            }
-            setTimeout(() => {
-                userClickEnabled = true; // Enable user clicks after sequence display
-            }, 1000 * shiningSequence.length);
-        }
-
-        function checkArraysEqual(arr1, arr2) {
-            if (arr1.length !== arr2.length) {
-                return false;
-            }
-            for (let i = 0; i < arr1.length; i++) {
-                if (arr1[i] !== arr2[i]) {
-                    return false;
-                }
-            }
-            return true;
-        }
-
-        colArr.forEach((element, index) => {
-            element.addEventListener('click', () => {
-                if (userClickEnabled) {
-                    element.classList.add('shining');
-                    setTimeout(() => {
-                        element.classList.remove('shining');
-                    }, 1000);
-                    shiningSequence.push(element);
-                    if (!checkArraysEqual(shiningSequence, colArr.slice(0, shiningSequence.length))) {
-                        notification.textContent = 'Wrong! Try again.';
-                        shiningSequence = [];
-                    } else if (shiningSequence.length === colArr.length) {
-                        notification.textContent = 'Congratulations! You won!';
-                        shiningSequence = [];
-                    }
-                }
-            });
-        });
-
-        window.onload = function () {
-            takeInput();
-            red = document.querySelector('#red');
-            green = document.querySelector('#green');
-            blue = document.querySelector('#blue');
-            yellow = document.querySelector('#yellow');
-            forEffect();
-        };
-    </script>
 </body>
 
 </html>
+
+<script>
+    document.addEventListener("DOMContentLoaded", () => {
+        document.getElementById('startText').addEventListener('click', startGame);
+    });
+
+    let buttonsCreated = false;
+    let timer;
+
+    function startGame() {
+        var username = prompt('Please enter your username:');
+
+        if (username !== null && username.trim() !== '') {
+            // Show the game container
+            document.querySelector('.game-container').style.display = 'flex';
+
+            if (!buttonsCreated) {
+                loadButtons();
+                buttonsCreated = true;
+            }
+
+            let usertext = document.querySelector('.user-text');
+            usertext.innerHTML = 'User: ' + username;
+            playSequence();
+        } else {
+            startGame();
+        }
+    }
+
+    function loadButtons() {
+        const gameContainer = document.querySelector('.game-container');
+
+        const buttonsRow1 = document.createElement('div');
+        buttonsRow1.classList.add('buttons-row-1', 'flex', 'gap-8');
+        ['green', 'red'].forEach(buttonId => {
+            const button = createButton(buttonId);
+            buttonsRow1.appendChild(button);
+        });
+
+        const buttonsRow2 = document.createElement('div');
+        buttonsRow2.classList.add('buttons-row-2', 'flex', 'gap-8');
+        ['yellow', 'blue'].forEach(buttonId => {
+            const button = createButton(buttonId);
+            buttonsRow2.appendChild(button);
+        });
+
+        gameContainer.appendChild(buttonsRow1);
+        gameContainer.appendChild(buttonsRow2);
+    }
+
+    function createButton(buttonId) {
+        const button = document.createElement('button');
+        button.id = buttonId;
+        button.onclick = () => playAndCheck('music/' + buttonId + '.mp3', getButtonIndex(buttonId));
+        return button;
+    }
+
+    function getButtonIndex(buttonId) {
+        const buttonIndexMap = { 'green': 0, 'red': 1, 'yellow': 2, 'blue': 3 };
+        return buttonIndexMap[buttonId];
+    }
+
+    let sequence = [];
+    let userSequence = [];
+    let level = 0;
+    let timeLimit = 20;
+
+    function playAndCheck(url, buttonIndex) {
+        playAudio(url);
+        userSequence.push(buttonIndex);
+
+        if (checkUserInput()) {
+            if (userSequence.length === sequence.length) {
+                setTimeout(() => {
+                    level++;
+                    timeLimit += 2;
+                    document.querySelector('.level-text').innerHTML = 'Level: ' + level;
+                    playSequence();
+                }, 1000);
+            }
+        } else {
+            alert('Game over! Your score is: ' + level);
+            resetGame();
+        }
+    }
+
+    function playSequence() {
+        userSequence = [];
+        addToSequence();
+        displaySequence();
+        startTimer();
+    }
+
+    function addToSequence() {
+        sequence.push(Math.floor(Math.random() * 4));
+    }
+
+    function displaySequence() {
+        let delay = 750;
+        let totalDuration = delay * sequence.length;
+
+        sequence.forEach((buttonIndex, index) => {
+            setTimeout(() => {
+                highlightButton(buttonIndex);
+                setTimeout(() => {
+                    unhighlightButton(buttonIndex);
+                }, delay / 2);
+            }, index * delay);
+        });
+
+        // Set timeout to stop the timer after the sequence is displayed
+        setTimeout(() => {
+            stopTimer();
+            // Set timeout to reset the game if the user doesn't finish in time
+            setTimeout(() => {
+                if (userSequence.length !== sequence.length) {
+                    alert('Time is up! Game over. Your score is: ' + level);
+                    resetGame();
+                }
+            }, timeLimit * 1000);
+        }, totalDuration);
+    }
+
+    function highlightButton(buttonIndex) {
+        let button = document.getElementById(getButtonId(buttonIndex));
+        button.classList.add('highlighted');
+        playAudio(getAudioUrl(buttonIndex));
+    }
+
+    function unhighlightButton(buttonIndex) {
+        let button = document.getElementById(getButtonId(buttonIndex));
+        button.classList.remove('highlighted');
+    }
+
+    function getButtonId(buttonIndex) {
+        return ['green', 'red', 'yellow', 'blue'][buttonIndex];
+    }
+
+    function getAudioUrl(buttonIndex) {
+        return 'music/' + getButtonId(buttonIndex) + '.mp3';
+    }
+
+    function checkUserInput() {
+        for (let i = 0; i < userSequence.length; i++) {
+            if (userSequence[i] !== sequence[i]) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    function startTimer() {
+        let seconds = 0;
+        document.querySelector('.timer-text').innerHTML = 'Timer: ' + seconds + 's';
+        timer = setInterval(() => {
+            seconds++;
+            const remainingTime = timeLimit - seconds;
+            document.querySelector('.timer-text').innerHTML = `Timer: ${seconds}s ( ${remainingTime}s left )`;
+
+            if (seconds >= timeLimit) {
+                clearInterval(timer);
+                alert('Time is up! Game over. Your score is: ' + level);
+                resetGame();
+            }
+        }, 1000);
+    }
+
+    function stopTimer() {
+        clearInterval(timer);
+        document.querySelector('.timer-text').innerHTML = 'Timer: 0s';
+    }
+
+
+    function resetGame() {
+        sequence = [];
+        userSequence = [];
+        level = 0;
+        timeLimit = 10;
+
+        const username = document.querySelector('.user-text').textContent.replace('User: ', '');
+        const score = document.querySelector('.level-text').textContent.replace('Level: ', '');
+
+        const existingScores = JSON.parse(localStorage.getItem('scores')) || [];
+
+        existingScores.push({ username, score });
+
+        localStorage.setItem('scores', JSON.stringify(existingScores));
+
+        document.querySelector('.level-text').innerHTML = 'Level: 0';
+        stopTimer();
+    }
+
+    function playAudio(url) {
+        new Audio(url).play();
+    }
+</script>

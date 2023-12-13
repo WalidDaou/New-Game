@@ -50,16 +50,16 @@
         </div>
         <div class="bottoms bg-white p-6">
             <div class="flex flex-row gap-8 justify-center items-center mb-8">
-                <button id="green" onclick="checkClick(this)"
+                <button id="green" onclick="greenEffect()"
                     class="circle text-white bg-green-500 h-36 w-60 rounded-xl">green</button>
-                <button id="red" onclick="checkClick(this)"
+                <button id="red" onclick="redEffect()"
                     class="circle text-white bg-red-500 h-36 w-60 rounded-xl">red</button>
             </div>
             <div class="flex flex-row gap-8 justify-center items-center mt-8">
 
-                <button id="yellow" onclick="checkClick(this)"
+                <button id="yellow" onclick="yellowEffect()"
                     class="circle text-white bg-yellow-300 h-36 w-60 rounded-xl">yellow</button>
-                <button id="blue" onclick="checkClick(this)"
+                <button id="blue" onclick="blueEffect()"
                     class="circle text-white bg-blue-500 h-36 w-60 rounded-xl">blue</button>
 
             </div>
@@ -191,49 +191,11 @@
 
         var userInput;
 
-
-        function checkClick(clickedButton) {
-            if (!userClickEnabled) {
-                return;
-            }
-
-            clickedButton.classList.add('shining');
-            clickedSequence.push(clickedButton);
-
-            if (checkArraysEqual(shiningSequence, clickedSequence)) {
-                if (clickedSequence.length === shiningSequence.length) {
-                    level++;
-                    notificationGame('right ,keep going');
-                    saveLevel();
-                    userClickEnabled = false;
-
-                    setTimeout(function () {
-                        resetItems();
-                        shiningSequence = [];
-                        clickedSequence = [];
-                        shineRandomItem();
-                    }, 1000);
-                }
-            } else {
-                notificationGame('wrong, try again')
-                startGame();
-                userClickEnabled = false;
-            }
-
-        }
-        // ... (Your existing code)
-
-
         function shineRandomItem() {
             resetItems();
             userClickEnabled = false;
             var randomButtonIndex = Math.floor(Math.random() * colArr.length);
-            var randomButtonIndex = Math.floor(Math.random() * colArr.length);
-            var randomButtonIndex = Math.floor(Math.random() * colArr.length);
-            var randomButtonIndex = Math.floor(Math.random() * colArr.length);
-            var randomButtonIndex = Math.floor(Math.random() * colArr.length);
-            var randomButtonIndex = Math.floor(Math.random() * colArr.length);
-            var randomButtonIndex = Math.floor(Math.random() * colArr.length);
+
             shiningSequence.push(colArr[randomButtonIndex]);
             for (let element of shiningSequence) {
                 setTimeout(function () {
@@ -250,7 +212,6 @@
             }, 1000 * shiningSequence.length);
         }
 
-
         function checkArraysEqual(arr1, arr2) {
             if (arr1.length !== arr2.length) {
                 return false;
@@ -262,6 +223,48 @@
             }
             return true;
         }
+
+
+        colArr.forEach((element, index) => {
+            element.addEventListener('click', () => {
+                if (!userClickEnabled) {
+                return;
+            }
+
+            element.classList.add('shining');
+            clickedSequence.push(element);
+
+            if (checkArraysEqual(shiningSequence, clickedSequence)) {
+                if (clickedSequence.length === shiningSequence.length) {
+                    level++;
+                    notificationGame('right, keep going');
+                    saveLevel();
+                    userClickEnabled = false;
+
+                    setTimeout(function () {
+                        resetItems();
+
+                     
+                        eraseClickedSequence()
+                        shineRandomItem();
+                    }, 1000);
+                }
+            } else {
+                notificationGame('wrong, try again');
+                startGame();
+                userClickEnabled = false; 
+               
+        }})
+    });
+
+        // ... (Your existing code)
+        function eraseClickedSequence() {
+            clickedSequence = [];
+        }
+
+
+
+
 
         window.onload = function () {
             takeInput();
